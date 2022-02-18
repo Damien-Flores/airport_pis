@@ -1,0 +1,50 @@
+@charset "UTF-8";
+
+#home {
+	margin-top: 40vh;
+	display: flex;
+	justify-content: center;
+	gap: 50px
+}
+
+#home h1, #home h2 {
+margin: 0;
+}
+
+#home > h1, #home > h2 {
+	margin: auto 0;
+}
+
+#home > div {
+	text-align: center;
+}
+
+#home > div > div {
+	display: flex;
+	justify-content: center;
+	gap: 20px;
+}
+
+#home .btn {
+	text-decoration: none;
+	color: black;
+	margin-top: 20px;
+	padding: 0 5px;
+	border-top: 5px solid #ffffff00;
+    border-bottom: 1px solid #00a6ed;
+    cursor: pointer;
+    transition: 100ms;
+}
+
+#home .btn:hover {
+    border-top: 5px solid #00a6ed;
+ 			background-color: #e5f7ff;
+ 			transition: 200ms;
+}
+
+#home > .logo {
+	width: 30px;
+	background-color: #00a6ed;
+	transform: skewX(-36deg);
+ 			border-radius: 0 10px;
+}
