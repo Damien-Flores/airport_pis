@@ -190,11 +190,25 @@
 		<style>
 			/* Buton Style */
 			.btn {
+				width: fit-content;
 				cursor: pointer;
 			    padding: 5px 10px;
 			    border-radius: 10px;
 			    border: none;
 			    box-shadow: 0 0 2px black, 0 0 10px #45454545 inset;
+			    background-color: rgb(239, 239, 239);
+    			margin: 0em;
+    			letter-spacing: normal;
+			    word-spacing: normal;
+			    line-height: normal;
+			    text-transform: none;
+			    text-indent: 0px;
+			    text-shadow: none;
+			    display: inline-block;
+			    text-align: center;
+			    align-items: flex-start;
+    			appearance: auto;
+    			-webkit-writing-mode: horizontal-tb !important;
 			}
 			
 			.btn:hover {
@@ -238,6 +252,12 @@
 	        <form id="main_form">
 	            <h4 id="main_form_title">Create a New Airline</h4>
 	            
+	            <div style="display: flex; align-items: center; margin-top: 20px;">
+	                <label for="airline_thumbnail" class="btn material-icons" style="margin: 0; color: #454545">add_photo_alternate</label>
+	                <input type="file" id="airline_thumbnail" name="airline_thumbnail" hidden>
+	            	<div style="margin-left: 10px;">Add Thumbnail</div>
+	            </div>
+	            
 	            <div>
 	                <label for="airline_code">Airline IATA Code</label>
 	                <input type="text" id="airline_code" name="airline_code" placeholder="AA" required>
@@ -246,11 +266,6 @@
 	            <div>
 	                <label for="airline_name">Airline Name</label>
 	                <input type="text" id="airline_name" name="airline_name" placeholder="American Airlines" required>
-	            </div>
-	
-	            <div>
-	                <label for="airline_thumbnail">Airline Thumbnail</label>
-	                <input type="file" id="airline_thumbnail" name="airline_thumbnail">
 	            </div>
 	
 	            <div class="form_btn">
@@ -263,7 +278,7 @@
 		<div id="delete-form-entry-modal" class="modal">
 			<h4>Are you sure you want to delete <code data-var="name">$CityName</code> from Database ?</h4>
 			<div class="modal_content">
-				<p><span>Loading :</span>Checking <code data-var="name">$CityName</code> database usage...</p>
+				<p><span>Loading: </span>Checking <code data-var="name">$CityName</code> database usage...</p>
 			</div>
 			<div class="modal_btn">
                 <button class="btn" type="reset">No</button>

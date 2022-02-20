@@ -11,15 +11,16 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hypnotech.airport_pis.beans.BeanReference;
 import com.hypnotech.airport_pis.beans.JsonBuilder;
 import com.hypnotech.airport_pis.beans.JsonBuilder.Status;
-import com.hypnotech.airport_pis.beans.BeanReference;
 
 public class Database {
 	protected Connection connection;
 	private String errorMessage;
 	private final String DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
 	private final String DB_URL = "jdbc:mysql://localhost/airport_pis";
+	private final String DB_NAME = "airport_pis";
 	private final String DB_USERNAME = "airport_pis";
 	private final String DB_PASSWORD = "rSIMcFhIzMEiEVQr";
 
@@ -56,11 +57,11 @@ public class Database {
 	}
 
 	protected String getForeignKeysQuery(String tableName) {
-		return "SELECT TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE  REFERENCED_TABLE_SCHEMA = 'si_vol' AND  REFERENCED_TABLE_NAME = '"
-				+ tableName + "';";
+		return "SELECT TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE  REFERENCED_TABLE_SCHEMA = '"
+				+ this.DB_NAME + "' AND  REFERENCED_TABLE_NAME = '" + tableName + "';";
 	}
 
-	protected List<BeanReference> getForeignReferenceFor(Object bean) throws SQLException {
+	public List<BeanReference> getForeignReferenceFor(Object bean) throws SQLException {
 		String className = bean.getClass().getName();
 		String[] classBundles = className.split("[.]");
 		String tableName = classBundles[classBundles.length - 1].toLowerCase();
@@ -186,7 +187,8 @@ public class Database {
 		return dataObjects;
 	}
 
-	public Integer setBeanData(Object bean) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, SQLException {
+	public Integer setBeanData(Object bean) throws IllegalArgumentException, IllegalAccessException,
+			NoSuchFieldException, SecurityException, SQLException {
 		PreparedStatement statement;
 		String className = bean.getClass().getName();
 		String[] classBundles = className.split("[.]");
@@ -199,7 +201,7 @@ public class Database {
 		String queryUpdate = "";
 		String queryWhereClause = "";
 		String query = "";
-		
+
 		for (Field field : classFields) {
 			String fieldName = field.getName();
 			Object fieldData = bean.getClass().getField(fieldName).get(bean);
@@ -207,8 +209,7 @@ public class Database {
 				queryAction = "UPDATE";
 				queryWhereClause = "WHERE " + fieldName + "=" + fieldData;
 				updateId = (Integer) fieldData;
-			}
-			else if (fieldData != null) {
+			} else if (fieldData != null) {
 				if (queryInsertTable != "" && queryInsertValue != "" && queryUpdate != "") {
 					queryInsertTable += ", ";
 					queryInsertValue += ", ";
@@ -219,28 +220,26 @@ public class Database {
 				queryUpdate += fieldName + "=\"" + fieldData + "\"";
 			}
 		}
-		
+
 		if (queryAction == "INSERT INTO") {
 			query = queryAction + " " + tableName + "(" + queryInsertTable + ") VALUES (" + queryInsertValue + ");";
-		}
-		else {
+		} else {
 			query = queryAction + " " + tableName + " SET " + queryUpdate + " " + queryWhereClause;
 		}
-		
+
 		System.out.println(query);
 		statement = this.connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 		statement.executeUpdate();
-		
+
 		if (queryAction == "INSERT INTO") {
 			ResultSet keys = statement.getGeneratedKeys();
 			keys.next();
-			return keys.getInt(1);			
-		}
-		else {
+			return keys.getInt(1);
+		} else {
 			return updateId;
 		}
 	}
-	
+
 	public void deleteObject(Object bean) throws SQLException, IllegalArgumentException, IllegalAccessException,
 			NoSuchFieldException, SecurityException {
 		PreparedStatement statement;

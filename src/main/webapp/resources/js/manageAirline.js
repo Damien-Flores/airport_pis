@@ -1,5 +1,5 @@
 /**
- * JS Function for ManageDestination Page
+ * JS Function for ManageAirline Page
  */
 let tableHandler;
  
@@ -136,24 +136,19 @@ class AirlineTable {
 
 	#confirmDelete(e){
 		const id = e.target.getAttribute('data-id');
-		const deletingDest = this.#getDataForDataId(id);
+		const deleting = this.#getDataForDataId(id);
 
 		document.querySelector('#delete-form-entry-modal button[type=submit]').setAttribute('data-id', id);
-		document.querySelector('#delete-form-entry-modal code[data-var=name]').innerHTML = deletingDest.destination_name;
+		document.querySelectorAll('#delete-form-entry-modal code[data-var=name]').forEach(element => element.innerHTML = deleting.airline_name);
 		document.querySelector('body').classList.add('modalLocked');
 		document.getElementById('delete-form-entry-modal').style.display = 'block';
 
-		const reqBody = {
-			"action": "isSafeToDelete",
-			"destination_id": id,
-		};
 		
-		fetch("api/destination", {
+		fetch("api/airline/checkfk/airline_id="+id, {
 			method: 'post',
 			headers: {
 				'Content-Type': 'application/json;charset=utf-8'
 			},
-			body: JSON.stringify(reqBody)
 		})
 		.then(res => res.json())
 		.then(data => {
@@ -173,7 +168,7 @@ class AirlineTable {
 				}
 				else {
 					document.querySelector('#delete-form-entry-modal button[type=submit]').innerHTML = "Yes, delete " + (linkedCount + 1) + " entries from database";
-					modalContent.innerHTML = "<p><span>Warning :</span> Deleting <code>" + deletingDest.destination_name + "</code> will also delete " + linkedCount + " flight(s) from database :</p>";
+					modalContent.innerHTML = "<p><span>Warning :</span> Deleting <code>" + deleting.airline_name + "</code> will also delete " + linkedCount + " flight(s) from database :</p>";
 					// TODO Generate a view with all data going to be deleted
 				}
 				document.querySelector('#delete-form-entry-modal button[type=submit]').removeAttribute("disabled");
@@ -189,23 +184,17 @@ class AirlineTable {
 
 	deleteEntry(e) {
 		const id = e.target.getAttribute('data-id');
-
-		const reqBody = {
-			"action": "delete",
-			"destination_id": id,
-		};
 		
-		fetch("api/destination", {
+		fetch("api/airline/delete/id="+id, {
 			method: 'post',
 			headers: {
 				'Content-Type': 'application/json;charset=utf-8'
-			},
-			body: JSON.stringify(reqBody)
+			}
 		})
 		.then(res => res.json())
 		.then(data => {
 			if (data.status == "OK"){
-				const uIndex = this.#responseData.findIndex(element => element.destination_id == reqBody.destination_id);
+				const uIndex = this.#responseData.findIndex(element => element.airline_id == reqBody.airline_id);
 				this.#responseData.splice(uIndex, 1);
 				this.#buildTableBody();
 				this.closeModal();
@@ -223,14 +212,14 @@ class AirlineTable {
 	 
 	#loadInForm(e){
 		const id = e.target.getAttribute('data-id');
-		const updatingDest = this.#getDataForDataId(id);
+		const updating = this.#getDataForDataId(id);
 		document.getElementById('main_form').style.backgroundColor = "#fffce5";
 		document.getElementById('main_form').style.borderColor = "#e6cf00";
-		document.getElementById('main_form_title').innerHTML = `Update Airline (${ updatingDest.airline_id })`;
+		document.getElementById('main_form_title').innerHTML = `Update Airline (${ updating.airline_id })`;
 		document.getElementById('main_form_title').style.borderColor = "#e6cf00";
-		document.getElementById('airline_code').value = updatingDest.airline_code;
-		document.getElementById('airline_name').value = updatingDest.airline_name;
-		document.getElementById('airline_name').setAttribute("data-updating-id", updatingDest.airline_id);
+		document.getElementById('airline_code').value = updating.airline_code;
+		document.getElementById('airline_name').value = updating.airline_name;
+		document.getElementById('airline_name').setAttribute("data-updating-id", updating.airline_id);
 	}
 	 
 	#disableForm() {
@@ -288,12 +277,12 @@ class AirlineTable {
 	 * @returns dataObject if data is existing and unique, false otherwise (Handle a refresh to try a data fix). 
 	 */
 	#getDataForDataId(dataId){
-		const updatingDest = this.#responseData.filter(element => element.airline_id == dataId);
+		const updating = this.#responseData.filter(element => element.airline_id == dataId);
 
-		if (updatingDest.length === 1) {
-			return updatingDest[0];
+		if (updating.length === 1) {
+			return updating[0];
 		}
-		else if (updatingDest.length === 0) {
+		else if (updating.length === 0) {
 			//No data
 			alert("An error has been encountered:\nNo id found in Airline dataset\nPage will be refreshed");
 			location.reload();
